@@ -3,12 +3,8 @@ import type { CellValue } from './types';
 import './App.css';
 
 function App() {
-  // Local state to store the status of 9 cells (for now, we’ll populate it with test data for layout purposes)
-  const [board, setBoard] = useState<CellValue[]>([
-    'X', null, 'O',
-    null, 'X', null,
-    null, null, 'O'
-  ]);
+  // Initialize empty 3x3 board matrix
+  const [board, setBoard] = useState<CellValue[]>(Array(9).fill(null));
 
   // Placeholder for cell click
   const handleCellClick = (index: number) => {
