@@ -3,11 +3,10 @@
   --tg-theme-text-color: #f5f5f5;
   --tg-theme-button-color: #2481cc;
   --tg-theme-button-text-color: #ffffff;
-  --cell-bg: #202b36;
-  --cell-border: #101921;
+  --tg-theme-hint-color: #708499;
+  --tg-theme-secondary-bg-color: #101921;
 }
 
-/* Base container sized for the Telegram screen */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -16,7 +15,7 @@
   min-height: 100vh;
   padding: 20px;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--tg-theme-bg-color);
   color: var(--tg-theme-text-color);
 }
@@ -34,6 +33,7 @@
 .status-turn {
   font-size: 18px;
   font-weight: 500;
+  color: var(--tg-theme-hint-color);
 }
 
 .status-turn span {
@@ -41,7 +41,6 @@
   color: var(--tg-theme-button-color);
 }
 
-/* Game area with a width constraint */
 .game-zone {
   width: 100%;
   max-width: 340px;
@@ -51,7 +50,6 @@
   justify-content: center;
 }
 
-/* Grid 3х3 */
 .board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -61,10 +59,9 @@
   height: 100%;
 }
 
-/* Cell styles */
 .cell {
-  background-color: var(--cell-bg);
-  border: 2px solid var(--cell-border);
+  background-color: var(--tg-theme-secondary-bg-color);
+  border: 1px solid var(--tg-theme-hint-color);
   border-radius: 12px;
   font-size: 42px;
   font-weight: bold;
@@ -79,10 +76,9 @@
 
 .cell:active {
   transform: scale(0.95);
-  background-color: #283645;
+  filter: brightness(1.2);
 }
 
-/* Different colors for X and O */
 .cell-x {
   color: #fa5252;
 }
@@ -91,7 +87,6 @@
   color: #4dabf7;
 }
 
-/* Reset button */
 .app-footer {
   width: 100%;
   max-width: 340px;
