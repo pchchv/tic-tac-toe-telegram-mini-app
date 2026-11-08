@@ -12,14 +12,14 @@ function App() {
 
   // Placeholder for cell click
   const handleCellClick = (index: number) => {
-    console.log(`Кликнули по ячейке с индексом: ${index}`);
+    console.log(`Clicked cell index: ${index}`);
   };
 
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>Tic-tac-toe ❌⭕</h1>
-        <div className="status-turn">Player's turn: <span>X</span></div>
+        <h1>Tic-Tac-Toe ❌⭕</h1>
+        <div className="status-turn">Next turn: <span>X</span></div>
       </header>
 
       <main className="game-zone">
@@ -38,7 +38,7 @@ function App() {
 
       <footer className="app-footer">
         <button className="reset-btn" onClick={() => setBoard(Array(9).fill(null))}>
-          Clear field
+          Reset Board
         </button>
       </footer>
     </div>
