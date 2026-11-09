@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { themeParams } from '@telegram-apps/sdk-react';
+import { themeParams, hapticFeedback } from '@telegram-apps/sdk-react';
 import { calculateWinner } from './utils';
 import type { CellValue } from './types';
 import './App.css';
@@ -35,15 +35,43 @@ function App() {
       return;
     }
 
-    // Immutable board update
     const newBoard = [...board];
-    newBoard[index] = isXNext ? 'X' : 'O';
+    const currentTurn = isXNext ? 'X' : 'O';
+    newBoard[index] = currentTurn;
     
+    // Calculate intermediate results to trigger haptics immediately
+    const nextWinner = calculateWinner(newBoard);
+    const nextDraw = !nextWinner && newBoard.every((cell) => cell !== null);
+
+    // Trigger Telegram Haptic Feedback safely
+    if (hapticFeedback) {
+      if (nextWinner) {
+        // Success notification for a win
+        if (hapticFeedback.notificationOccurred.isAvailable()) {
+          hapticFeedback.notificationOccurred('success');
+        }
+      } else if (nextDraw) {
+        // Warning notification for a draw
+        if (hapticFeedback.notificationOccurred.isAvailable()) {
+          hapticFeedback.notificationOccurred('warning');
+        }
+      } else {
+        // Soft impact tap for a regular turn
+        if (hapticFeedback.impactOccurred.isAvailable()) {
+          hapticFeedback.impactOccurred('light');
+        }
+      }
+    }
+
     setBoard(newBoard);
     setIsXNext(!isXNext);
   };
 
   const handleReset = () => {
+    // Light vibration when resetting the field
+    if (hapticFeedback && hapticFeedback.impactOccurred.isAvailable()) {
+      hapticFeedback.impactOccurred('medium');
+    }
     setBoard(Array(9).fill(null));
     setIsXNext(true);
   };
