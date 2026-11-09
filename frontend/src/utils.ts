@@ -1,3 +1,5 @@
+import type { CellValue } from './types';
+
 // Array of 8 concrete winning index lines within a 3x3 grid
 const WINNING_COMBINATIONS: number[][] = [
   // Rows
@@ -12,3 +14,16 @@ const WINNING_COMBINATIONS: number[][] = [
   [0, 4, 8],
   [2, 4, 6]
 ];
+
+/**
+ * Checks the current board state and returns the winner ('X' or 'O') or null
+ */
+export function calculateWinner(board: CellValue[]): CellValue {
+  for (const combination of WINNING_COMBINATIONS) {
+    const [a, b, c] = combination;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
+    }
+  }
+  return null;
+}
