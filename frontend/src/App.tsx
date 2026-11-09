@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import { themeParams } from '@telegram-apps/sdk-react';
+import { calculateWinner } from './utils';
 import type { CellValue } from './types';
 import './App.css';
 
 function App() {
-  // Initialize empty 3x3 board matrix
+  // Game state
   const [board, setBoard] = useState<CellValue[]>(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState<boolean>(true);
+
+  // Determine game status
+  const winner = calculateWinner(board);
+  const isDraw = !winner && board.every((cell) => cell !== null);
 
   useEffect(() => {
     // Check if theme parameters component is available
@@ -23,16 +29,40 @@ function App() {
     }
   }, []);
 
-  // Placeholder for cell click
   const handleCellClick = (index: number) => {
-    console.log(`Clicked cell index: ${index}`);
+    // Return early if the cell is already taken or game is finished
+    if (board[index] || winner || isDraw) {
+      return;
+    }
+
+    // Immutable board update
+    const newBoard = [...board];
+    newBoard[index] = isXNext ? 'X' : 'O';
+    
+    setBoard(newBoard);
+    setIsXNext(!isXNext);
   };
+
+  const handleReset = () => {
+    setBoard(Array(9).fill(null));
+    setIsXNext(true);
+  };
+
+  // Generate status text message
+  let statusMessage = `Next turn: ${isXNext ? 'X' : 'O'}`;
+  if (winner) {
+    statusMessage = `Winner: ${winner} 🎉`;
+  } else if (isDraw) {
+    statusMessage = `It's a draw! 🤝`;
+  }
 
   return (
     <div className="app-container">
       <header className="app-header">
         <h1>Tic-Tac-Toe ❌⭕</h1>
-        <div className="status-turn">Next turn: <span>X</span></div>
+        <div className={`status-turn ${winner ? 'status-winner' : ''}`}>
+          {statusMessage}
+        </div>
       </header>
 
       <main className="game-zone">
@@ -42,6 +72,7 @@ function App() {
               key={index} 
               className={`cell ${value ? `cell-${value.toLowerCase()}` : ''}`}
               onClick={() => handleCellClick(index)}
+              disabled={!!value || !!winner || isDraw}
             >
               {value}
             </button>
@@ -50,8 +81,8 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <button className="reset-btn" onClick={() => setBoard(Array(9).fill(null))}>
-          Reset Board
+        <button className="reset-btn" onClick={handleReset}>
+          Restart Game
         </button>
       </footer>
     </div>
