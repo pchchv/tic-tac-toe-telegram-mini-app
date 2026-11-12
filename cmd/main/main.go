@@ -1,9 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"tic-tac-toe-miniapp/internal/config"
+	"time"
 )
 
 func main() {
@@ -36,4 +41,19 @@ func main() {
 			log.Fatalf("Server failed to start: %v\n", err)
 		}
 	}()
+
+	// Graceful shutdown handling
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	<-stop
+
+	log.Println("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v\n", err)
+	}
+
+	log.Println("Server gracefully stopped")
 }
