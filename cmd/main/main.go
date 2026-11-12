@@ -22,4 +22,18 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status": "ok", "message": "Backend is running"}`))
 	})
+
+	// Setup HTTP server
+	server := &http.Server{
+		Addr:    cfg.ListenAddress,
+		Handler: mux,
+	}
+
+	// Start server in a goroutine
+	go func() {
+		log.Printf("Server is starting on %s\n", cfg.ListenAddress)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server failed to start: %v\n", err)
+		}
+	}()
 }
