@@ -50,3 +50,15 @@ func (b *Bot) startHandler(ctx context.Context, tgBot *bot.Bot, update *models.U
 		log.Printf("Failed to send /start message: %v\n", err)
 	}
 }
+
+// defaultHandler handles all other unrecognized messages
+func (b *Bot) defaultHandler(ctx context.Context, tgBot *bot.Bot, update *models.Update) {
+	if update.Message == nil {
+		return
+	}
+
+	_, _ = tgBot.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: update.Message.Chat.ID,
+		Text:   "Send /start to launch the Tic-Tac-Toe game.",
+	})
+}
