@@ -33,6 +33,12 @@ func New(token string, webAppURL string) (*Bot, error) {
 	return b, nil
 }
 
+// Start begins polling updates from Telegram servers (blocking call)
+func (b *Bot) Start(ctx context.Context) {
+	log.Println("Telegram bot started polling...")
+	b.api.Start(ctx)
+}
+
 // startHandler responds to /start with a WebApp launch button
 func (b *Bot) startHandler(ctx context.Context, tgBot *bot.Bot, update *models.Update) {
 	if update.Message == nil {
