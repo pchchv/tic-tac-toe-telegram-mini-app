@@ -14,6 +14,25 @@ type Bot struct {
 	webAppURL string
 }
 
+// New initializes a new Telegram bot instance with command handlers
+func New(token string, webAppURL string) (*Bot, error) {
+	b := &Bot{
+		webAppURL: webAppURL,
+	}
+	opts := []bot.Option{
+		bot.WithDefaultHandler(b.defaultHandler),
+	}
+	tgBot, err := bot.New(token, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	b.api = tgBot
+	// Register /start command handler
+	b.api.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, b.startHandler)
+	return b, nil
+}
+
 // startHandler responds to /start with a WebApp launch button
 func (b *Bot) startHandler(ctx context.Context, tgBot *bot.Bot, update *models.Update) {
 	if update.Message == nil {
