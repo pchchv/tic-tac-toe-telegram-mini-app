@@ -15,6 +15,10 @@ func main() {
 	// Load application configuration
 	cfg := config.Load()
 
+	// Setup root context with cancellation for graceful shutdown
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	if cfg.BotToken == "" {
 		log.Println("Warning: TG_BOT_TOKEN is not set")
 	}
@@ -34,7 +38,7 @@ func main() {
 		Handler: mux,
 	}
 
-	// Start server in a goroutine
+	// Start HTTP server in a goroutine
 	go func() {
 		log.Printf("Server is starting on %s\n", cfg.ListenAddress)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -42,18 +46,16 @@ func main() {
 		}
 	}()
 
-	// Graceful shutdown handling
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-	<-stop
+	// Wait for termination signal
+	<-ctx.Done()
 
 	log.Println("Shutting down server...")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if err := server.Shutdown(ctx); err != nil {
+	if err := server.Shutdown(shutdownCtx); err != nil {
 		log.Fatalf("Server forced to shutdown: %v\n", err)
 	}
 
-	log.Println("Server gracefully stopped")
+	log.Println("Application gracefully stopped")
 }
