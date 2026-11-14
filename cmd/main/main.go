@@ -21,11 +21,12 @@ func main() {
 	defer stop()
 
 	// Initialize and start Telegram bot if token is provided
-	if cfg.BotToken == "" {
+	switch cfg.BotToken {
+	case "":
 		log.Println("Warning: TG_BOT_TOKEN is not set, skipping bot startup")
-	} else if cfg.BotToken == "your_bot_token_here" {
+	case "your_bot_token_here":
 		log.Println("Warning: Valid TG_BOT_TOKEN is not set, skipping bot startup")
-	} else {
+	default:
 		tgBot, err := bot.New(cfg.BotToken, cfg.WebAppURL)
 		if err != nil {
 			log.Fatalf("Failed to initialize Telegram bot: %v\n", err)
