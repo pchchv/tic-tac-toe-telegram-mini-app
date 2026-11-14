@@ -20,8 +20,9 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if cfg.BotToken == "" {
-		log.Println("Warning: TG_BOT_TOKEN is not set")
+	// Initialize and start Telegram bot if token is provided
+	if cfg.BotToken == "" || cfg.BotToken == "your_bot_token_here" {
+		log.Println("Warning: Valid TG_BOT_TOKEN is not set, skipping bot startup")
 	}
 
 	tgBot, err := bot.New(cfg.BotToken, cfg.WebAppURL)
