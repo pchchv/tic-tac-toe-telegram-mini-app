@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"tic-tac-toe-miniapp/internal/bot"
 	"tic-tac-toe-miniapp/internal/config"
 	"time"
 )
@@ -22,6 +23,12 @@ func main() {
 	if cfg.BotToken == "" {
 		log.Println("Warning: TG_BOT_TOKEN is not set")
 	}
+
+	tgBot, err := bot.New(cfg.BotToken, cfg.WebAppURL)
+	if err != nil {
+		log.Fatalf("Failed to initialize Telegram bot: %v\n", err)
+	}
+	go tgBot.Start(ctx)
 
 	// Initialize HTTP router
 	mux := http.NewServeMux()
