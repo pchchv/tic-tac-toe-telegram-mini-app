@@ -6,6 +6,19 @@ import (
 	"path/filepath"
 )
 
+// NewRouter configures HTTP routes for both API endpoints and static frontend files
+func NewRouter(staticDir string) *http.ServeMux {
+	mux := http.NewServeMux()
+	// Health check API endpoint
+	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"status": "ok", "message": "Backend is running"}`))
+	})
+	// Serve static files with SPA fallback to index.html
+	mux.HandleFunc("/", spaHandler(staticDir))
+	return mux
+}
+
 // spaHandler serves static assets from staticDir and falls back to index.html for unknown routes
 func spaHandler(staticDir string) http.HandlerFunc {
 	fileServer := http.FileServer(http.Dir(staticDir))
