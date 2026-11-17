@@ -1,19 +1,49 @@
 package server
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
+
+	"tic-tac-toe-miniapp/internal/auth"
 )
 
 // NewRouter configures HTTP routes for both API endpoints and static frontend files
-func NewRouter(staticDir string) *http.ServeMux {
+func NewRouter(staticDir string, botToken string) *http.ServeMux {
 	mux := http.NewServeMux()
 	// Health check API endpoint
 	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"status": "ok", "message": "Backend is running"}`))
 	})
+
+	// Protected endpoint to verify initData and return user profile
+	mux.HandleFunc("/api/me", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		// Expecting header format: "Authorization: tma <raw_init_data>"
+		authHeader := r.Header.Get("Authorization")
+		initData := strings.TrimPrefix(authHeader, "tma ")
+
+		// Validate signature (allowing sessions up to 24 hours old)
+		user, err := auth.ValidateInitData(initData, botToken, 24*time.Hour)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			_ = json.NewEncoder(w).Encode(map[string]string{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"status": "authenticated",
+			"user":   user,
+		})
+	})
+
 	// Serve static files with SPA fallback to index.html
 	mux.HandleFunc("/", spaHandler(staticDir))
 	return mux

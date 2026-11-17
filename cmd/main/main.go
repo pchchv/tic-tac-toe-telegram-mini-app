@@ -36,7 +36,7 @@ func main() {
 	}
 
 	// Initialize HTTP router serving API and frontend static files
-	router := server.NewRouter("./frontend/dist")
+	router := server.NewRouter("./frontend/dist", cfg.BotToken)
 
 	// Setup HTTP server
 	httpServer := &http.Server{
